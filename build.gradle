@@ -4,9 +4,19 @@
 
 plugins {
 	id "base"
+	id "org.sonarqube" version "7.5.0.8588"
 }
 
 description = "Spring Boot Build"
+
+sonar {
+	properties {
+		property "sonar.projectKey", "CESI-test_spring-boot"
+		property "sonar.organization", "cesi-test"
+		property "sonar.host.url", "https://sonarcloud.io"
+		property "sonar.projectName", "Spring Boot"
+	}
+}
 
 defaultTasks 'build'
 
