@@ -1,0 +1,43 @@
+name: SonarCloud Analysis
+
+on:
+  push:
+    branches:
+      - main # ou la branche principale de ton fork (ex: master)
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  build:
+    name: Build and analyze
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Important pour l'analyse précise par SonarCloud
+
+      - name: Set up JDK 21 # Modifie la version selon ton projet (ex: 17 ou 21)
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Cache SonarCloud packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
+      - name: Build and analyze with Maven
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Fourni automatiquement par GitHub
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}    # À créer dans tes secrets GitHub
+        run: >
+          mvn -B clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
+          -Dsonar.projectKey=CESI-test_spring-boot
+          -Dsonar.organization=cesi-test
+          -Dsonar.host.url=https://sonarcloud.io
